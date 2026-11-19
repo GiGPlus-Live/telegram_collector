@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Collector Administration</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>کالکتور تلگرام</h1>
+          <p>سامانه مانیتورینگ و ارسال به ماتریکس</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-tab="dashboard">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </span>
+          <span>داشبورد کل</span>
+        </a>
+
+        <a class="nav-item" data-tab="accounts">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </span>
+          <span>اکانت‌های تلگرام</span>
+          <span class="badge badge-tg" id="nav-badge-accounts">0</span>
+        </a>
+
+        <a class="nav-item" data-tab="channels">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </span>
+          <span>مدیریت کانال‌ها</span>
+          <span class="badge badge-info" id="nav-badge-channels">0</span>
+        </a>
+
+        <a class="nav-item" data-tab="matrix">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="20" rx="4"></rect>
+              <path d="M7 8v8M17 8v8M12 8v8"></path>
+            </svg>
+          </span>
+          <span>سرورهای ماتریکس</span>
+          <span class="badge badge-matrix" id="nav-badge-matrix">0</span>
+        </a>
+
+        <a class="nav-item" data-tab="proxy">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 0 0-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+          </span>
+          <span>تنظیمات پروکسی</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-language"></div>
+        <div class="system-status-indicator">
+          <div>
+            <span class="status-dot" id="system-status-dot"></span>
+            <span id="system-status-text">سیستم آماده به کار</span>
+          </div>
+          <span class="badge badge-success" id="collector-state-badge">آنلاین</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="منو">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="page-title-box">
+            <h2 id="current-tab-title">داشبورد مانیتورینگ</h2>
+            <p id="current-tab-desc">خلاصه وضعیت، سرویس‌ها و اتصالات فعال</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-all">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            بروزرسانی داده‌ها
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-open-security">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            امنیت و 2FA
+          </button>
+          <div class="user-profile-badge" id="user-profile-badge" style="display: flex; align-items: center; gap: 6px;">
+            <span class="badge badge-info" id="topbar-username">admin</span>
+          </div>
+          <button class="btn btn-danger btn-sm" id="btn-logout" title="خروج از پنل">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            خروج
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <main class="content-body">
+        
+        <!-- ==================================================== -->
+        <!-- TAB 1: DASHBOARD OVERVIEW -->
+        <!-- ==================================================== -->
+        <section class="tab-content active" id="tab-dashboard">
+          <!-- Stat Cards Grid -->
+          <div class="stats-grid">
+            <div class="stat-card tg-accent">
+              <div class="stat-header">
+                <span class="stat-title">اکانت‌های تلگرام فعال</span>
+                <span class="stat-value" id="dash-stat-accounts">0</span>
+                <span class="stat-subtitle" id="dash-stat-accounts-sub">
+                  <span class="status-dot"></span> آماده مانیتورینگ
+                </span>
+              </div>
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+            </div>
+
+            <div class="stat-card purple-accent">
+              <div class="stat-header">
+                <span class="stat-title">کانال‌های تحت رصد</span>
+                <span class="stat-value" id="dash-stat-channels">0</span>
+                <span class="stat-subtitle" id="dash-stat-channels-sub">
+                  <span class="status-dot"></span> کانال فعال در حال استخراج
+                </span>
+              </div>
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="stat-card matrix-accent">
+              <div class="stat-header">
+                <span class="stat-title">سرورهای مقصد ماتریکس</span>
+                <span class="stat-value" id="dash-stat-matrix">0</span>
+                <span class="stat-subtitle" id="dash-stat-matrix-sub">
+                  <span class="status-dot"></span> اتصال به سینپس ماتریکس
+                </span>
+              </div>
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="2" width="20" height="20" rx="4"></rect>
+                  <path d="M7 8v8M17 8v8M12 8v8"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="stat-card proxy-accent">
+              <div class="stat-header">
+                <span class="stat-title">وضعیت پروکسی</span>
+                <span class="stat-value" id="dash-stat-proxy">غیرفعال</span>
+                <span class="stat-subtitle" id="dash-stat-proxy-sub">پروتکل: مستقیم (Direct)</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions & Status Summary -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>دسترسی سریع به عملیات پرکاربرد</h3>
+                <p>مدیریت سریع اتصالات و کانال‌های مانیتورینگ</p>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm" id="btn-quick-add-account">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  ورود اکانت تلگرام
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-quick-add-channel">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  ثبت کانال جدید
+                </button>
+                <button class="btn btn-matrix btn-sm" id="btn-quick-add-matrix">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  افزودن سرور ماتریکس
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Channel Overview Table Preview -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>کانال تلگرام</th>
+                    <th>بازه بررسی</th>
+                    <th>اتاق مقصد ماتریکس</th>
+                    <th>آخرین شناسه پیام</th>
+                    <th>وضعیت رصد</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-channels-preview-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- TAB 2: TELEGRAM ACCOUNTS -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-accounts">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>اکانت‌های متصل تلگرام</h3>
+                <p>مدیریت سشن‌های فعال GramJS و ورود با شماره، کد تایید و رمز دوم (2FA)</p>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-primary" id="btn-open-login-modal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  ورود اکانت تلگرام جدید
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>شماره تماس</th>
+                    <th>نام / نام‌کاربری</th>
+                    <th>API ID</th>
+                    <th>وضعیت</th>
+                    <th>آخرین فعالیت</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="accounts-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- TAB 3: CHANNELS MANAGEMENT -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-channels">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>مدیریت کانال‌های تلگرام</h3>
+                <p>تعریف کانال‌های هدف، فرکانس بررسی، و مقصد ارسال در سرور ماتریکس</p>
+              </div>
+              <div class="card-actions">
+                <div style="min-width: 200px;">
+                  <input type="text" class="form-control" id="channel-search-input" placeholder="جستجو در کانال‌ها...">
+                </div>
+                <button class="btn btn-primary" id="btn-open-add-channel-modal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  ثبت کانال جدید
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>کانال تلگرام</th>
+                    <th>عنوان کانال</th>
+                    <th>بازه بررسی</th>
+                    <th>اتاق‌های ماتریکس</th>
+                    <th>آخرین شناسه پیام</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="channels-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- TAB 4: MATRIX SERVERS & CHANNELS -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-matrix">
+          <!-- Card 1: Matrix Servers -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>سرورهای ماتریکس (Matrix Homeservers)</h3>
+                <p>پیکربندی سرورهای چندگانه سینپس / ماتریکس و مدیریت توکن ربات‌ها</p>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-matrix" id="btn-open-add-matrix-modal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  افزودن سرور ماتریکس
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>نام سرور</th>
+                    <th>آدرس سرور URL</th>
+                    <th>شناسه ربات (User ID)</th>
+                    <th>اتاق پیش‌فرض</th>
+                    <th>وضعیت اتصال</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="matrix-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 2: Matrix Channels (Rooms & Upload Policies) -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>کانال‌ها و اتاق‌های ماتریکس (Matrix Channels & Upload Settings)</h3>
+                <p>تعریف کانال‌های مقصد در ماتریکس، اتصال به سرور مربوطه و تنظیم سقف‌های آپلود مدیا</p>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-primary" id="btn-open-add-matrix-channel-modal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  تعریف کانال ماتریکس جدید
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>نام کانال ماتریکس</th>
+                    <th>سرور ماتریکس متصل</th>
+                    <th>آدرس اتاق</th>
+                    <th>قوانین آپلود مدیا</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="matrix-channels-tbody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- TAB 5: SOCKS PROXY SETTINGS -->
+        <!-- ==================================================== -->
+        <section class="tab-content" id="tab-proxy">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>تنظیمات پروکسی و دور زدن فیلترینگ</h3>
+                <p>پیکربندی پروکسی جهت اتصال مطمئن GramJS و تلگرام به سرورهای کلاد</p>
+              </div>
+              <div class="card-actions">
+                <div class="switch-wrapper">
+                  <span class="switch-title" style="margin-inline-end: 8px;">فعال‌سازی پروکسی:</span>
+                  <label class="switch">
+                    <input type="checkbox" id="proxy-master-enable">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <form id="proxy-form">
+              <div class="form-group">
+                <label class="form-label">انتخاب نوع پروتکل پروکسی:</label>
+                <div class="protocol-cards">
+                  <div class="protocol-card selected" data-protocol="socks5">
+                    <h4>SOCKS5</h4>
+                    <p>استاندارد و امن</p>
+                  </div>
+                  <div class="protocol-card" data-protocol="socks4">
+                    <h4>SOCKS4</h4>
+                    <p>پروتکل ساده</p>
+                  </div>
+                  <div class="protocol-card" data-protocol="mtproto">
+                    <h4>MTProto</h4>
+                    <p>پروکسی اختصاصی تلگرام</p>
+                  </div>
+                  <div class="protocol-card" data-protocol="http">
+                    <h4>HTTP</h4>
+                    <p>پروکسی عمومی وب</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="proxy-host">هاست یا آدرس IP <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="proxy-host" placeholder="مثلاً: 127.0.0.1 یا proxy.example.com" required>
+                </div>
+                <div class="form-group" style="max-width: 180px;">
+                  <label class="form-label" for="proxy-port">پورت <span class="req">*</span></label>
+                  <input type="number" class="form-control" id="proxy-port" placeholder="10808" min="1" max="65535" required>
+                </div>
+              </div>
+
+              <!-- Standard Auth fields (SOCKS5/HTTP) -->
+              <div id="proxy-standard-auth" class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="proxy-username">نام کاربری (اختیاری)</label>
+                  <input type="text" class="form-control" id="proxy-username" placeholder="در صورت نیاز وارد کنید">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="proxy-password">رمز عبور (اختیاری)</label>
+                  <input type="password" class="form-control" id="proxy-password" placeholder="در صورت نیاز وارد کنید">
+                </div>
+              </div>
+
+              <!-- MTProto Secret field -->
+              <div id="proxy-mtproto-auth" class="form-group" style="display: none;">
+                <label class="form-label" for="proxy-secret">کلید رمزگذاری MTProto (Secret)</label>
+                <input type="text" class="form-control" id="proxy-secret" placeholder="مثلاً: ee112233... یا کلید هگز ۳۲ کاراکتری">
+              </div>
+
+              <!-- Test Result Box -->
+              <div id="proxy-test-result" class="test-result-box"></div>
+              <p class="form-helper" id="proxy-test-requirements">برای تست، پروکسی را فعال و ذخیره کنید و یک اکانت فعال تلگرام ثبت کنید.</p>
+
+              <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="button" class="btn btn-secondary" id="btn-test-proxy" aria-describedby="proxy-test-requirements" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                  </svg>
+                  تست اتصال پروکسی
+                </button>
+                <button type="submit" class="btn btn-primary" id="btn-save-proxy">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  ذخیره تنظیمات پروکسی
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- MODAL: TELEGRAM STEP-BY-STEP LOGIN WIZARD -->
+  <!-- ==================================================== -->
+  <div class="modal-backdrop" id="modal-tg-login">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--tg-blue)" stroke-width="2">
+            <path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 7.5a2.25 2.25 0 0 0 .126 4.137l4.33 1.344 1.637 5.093c.277.863 1.378 1.107 1.99.44l2.58-2.82 4.675 3.447a2.25 2.25 0 0 0 3.518-1.42l3-15.5a2.25 2.25 0 0 0-2.334-2.636z"></path>
+          </svg>
+          <h3>ورود به حساب تلگرام (مرحله‌ای)</h3>
+        </div>
+        <button class="modal-close-btn" data-close="modal-tg-login">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Live Proxy Status Banner -->
+        <div class="modal-proxy-status-card" id="tg-modal-proxy-status">
+          <div class="proxy-status-indicator">
+            <span class="status-pulse-dot" id="tg-proxy-dot"></span>
+            <div class="proxy-status-text">
+              <div class="proxy-title">
+                <span id="tg-proxy-title-text">در حال بررسی وضعیت پروکسی...</span>
+                <span class="proxy-proto-tag" id="tg-proxy-badge-type" style="display:none;">SOCKS5</span>
+                <code class="proxy-addr-tag" id="tg-proxy-badge-addr" style="display:none;">-</code>
+              </div>
+              <p class="proxy-subtext" id="tg-proxy-subtext">ترافیک اتصال تلگرام بر اساس تنظیمات پنل عبور داده می‌شود.</p>
+            </div>
+          </div>
+          <button type="button" class="btn-proxy-action" id="btn-modal-proxy-action" style="display:none;">
+            تنظیمات پروکسی
+          </button>
+        </div>
+
+        <!-- Stepper Indicator -->
+        <div class="stepper-header">
+          <div class="step-item active" id="step-nav-1">
+            <div class="step-circle">۱</div>
+            <span class="step-label">شماره و مشخصات API</span>
+          </div>
+          <div class="step-item" id="step-nav-2">
+            <div class="step-circle">۲</div>
+            <span class="step-label">کد تایید</span>
+          </div>
+          <div class="step-item" id="step-nav-3">
+            <div class="step-circle">۳</div>
+            <span class="step-label">رمز دو مرحله‌ای</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Country + Phone + API credentials -->
+        <div class="step-panel active" id="step-panel-1">
+          <form id="form-tg-step1" novalidate>
+            <!-- Hidden full phone field -->
+            <input type="hidden" id="tg-login-phone" name="phone">
+
+            <!-- Telegram-style Country Selector & Phone Input -->
+            <div class="form-group tg-phone-picker-section">
+              <label class="form-label">
+                کشور و شماره همراه تلگرام <span class="req">*</span>
+              </label>
+
+              <!-- Country dropdown selector button -->
+              <div class="country-picker-container" id="tg-country-picker-wrap">
+                <button type="button" class="country-picker-btn" id="tg-country-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="country-flag" id="tg-selected-flag">🇮🇷</span>
+                  <span class="country-name" id="tg-selected-country-name">ایران (Iran)</span>
+                  <span class="country-code-badge" id="tg-selected-dial-code">+98</span>
+                  <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+
+                <!-- Searchable Country Dropdown Menu -->
+                <div class="country-dropdown-menu" id="tg-country-dropdown" style="display: none;">
+                  <div class="country-search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="tg-country-search-input" placeholder="جستجوی کشور یا پیش‌شماره (فارسی / English)..." autocomplete="off">
+                  </div>
+                  <ul class="country-list" id="tg-country-list" role="listbox">
+                    <!-- Populated dynamically via JS -->
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Phone national number input with connected dial prefix -->
+              <div class="phone-input-group">
+                <span class="phone-dial-prefix" id="tg-dial-prefix">+98</span>
+                <input type="tel"
+                       class="form-control phone-national-input"
+                       id="tg-login-phone-number"
+                       placeholder="912 345 6789"
+                       dir="ltr"
+                       required
+                       autocomplete="tel">
+              </div>
+              <p class="form-helper" id="tg-phone-preview-helper">
+                شماره نهایی بین‌المللی: <strong id="tg-full-phone-preview" dir="ltr">+98</strong>
+              </p>
+            </div>
+
+            <!-- Interactive Collapsible Guide for API ID & Hash -->
+            <div class="api-guide-accordion" id="tg-api-guide-acc">
+              <button type="button" class="api-guide-toggle" id="tg-api-guide-btn">
+                <div class="guide-toggle-left">
+                  <span class="guide-icon">💡</span>
+                  <span class="guide-title">راهنمای دریافت API ID و API Hash تلگرام (رسمی و رایگان)</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="badge-free">راهنما (کلیک کنید)</span>
+                  <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </div>
+              </button>
+
+              <div class="api-guide-content" id="tg-api-guide-body" style="display: none;">
+                <div class="guide-why-box">
+                  <strong>چرا API ID و API Hash لازم است؟</strong>
+                  <p>تلگرام برای ارسال کد ورود، شمارهٔ موبایل و مشخصات برنامهٔ متصل به حساب را لازم دارد.</p>
+                </div>
+
+                <div class="guide-steps-list">
+                  <div class="guide-step-item">
+                    <div class="step-num-badge">۱</div>
+                    <div class="step-desc">
+                      <strong>ورود به پرتال رسمی تلگرام:</strong>
+                      سایت <a href="https://my.telegram.org/apps" target="_blank" rel="noopener noreferrer" class="link-highlight">my.telegram.org/apps ↗</a> را در مرورگر باز کنید. شماره موبایل خود را وارد کرده و کد تاییدی که در اپلیکیشن تلگرام برایتان ارسال می‌شود را وارد نمایید.
+                    </div>
+                  </div>
+                  <div class="guide-step-item">
+                    <div class="step-num-badge">۲</div>
+                    <div class="step-desc">
+                      <strong>ساخت اپلیکیشن (API development tools):</strong>
+                      روی گزینه <strong>API development tools</strong> کلیک کنید. در فرم ساده، برای <em>App title</em> و <em>Short name</em> نام دلخواه انگلیسی (مانند <code>CollectorApp</code>) بنویسید و دکمه <em>Create application</em> را بزنید.
+                    </div>
+                  </div>
+                  <div class="guide-step-item">
+                    <div class="step-num-badge">۳</div>
+                    <div class="step-desc">
+                      <strong>کپی در فیلدهای زیر:</strong>
+                      <strong>App api_id</strong> و <strong>App api_hash</strong> را از همان برنامه کپی کنید و در دو کادر زیر وارد کنید.
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- API ID and API Hash Inputs -->
+            <div class="form-group api-inputs-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <strong class="form-label" style="margin-bottom:0;">مشخصات API تلگرام</strong>
+                <span style="font-size:0.75rem; color:var(--text-muted);">از my.telegram.org دریافت کنید</span>
+              </div>
+              <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div class="form-group" style="flex:1; min-width: 130px; margin-bottom:0;">
+                  <label class="form-label" for="tg-login-api-id" style="font-size:0.8rem;">API ID (الزامی)</label>
+                  <input type="text" class="form-control" id="tg-login-api-id" inputmode="numeric" autocomplete="off" required dir="ltr" placeholder="API ID برنامهٔ تلگرام" style="text-align: left; font-family: monospace;">
+                </div>
+                <div class="form-group" style="flex:2; min-width: 200px; margin-bottom:0;">
+                  <label class="form-label" for="tg-login-api-hash" style="font-size:0.8rem;">API Hash (الزامی)</label>
+                  <input type="password" class="form-control" id="tg-login-api-hash" autocomplete="off" required dir="ltr" placeholder="API Hash برنامهٔ تلگرام" style="text-align: left; font-family: monospace;">
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; background: transparent; border-top: none;">
+              <button type="button" class="btn btn-secondary" data-close="modal-tg-login">انصراف</button>
+              <button type="submit" class="btn btn-primary" id="btn-tg-send-code">
+                ارسال کد تایید تلگرام
+                <svg class="wizard-direction-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2: Verification Code -->
+        <div class="step-panel" id="step-panel-2">
+          <form id="form-tg-step2">
+            <div class="form-group">
+              <label class="form-label" for="tg-login-code">کد ۵ رقمی تایید تلگرام <span class="req">*</span></label>
+              <input type="text" class="form-control" id="tg-login-code" placeholder="12345" required maxlength="10" style="direction: ltr; text-align: center; font-size: 1.3rem; letter-spacing: 4px;">
+              <p class="form-helper" id="tg-code-sent-note">کد ورود به حساب رسمی تلگرام ارسال شد.</p>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; background: transparent; border-top: none;">
+              <button type="button" class="btn btn-secondary" id="btn-tg-back-to-step1">بازگشت</button>
+              <button type="submit" class="btn btn-primary" id="btn-tg-verify-code">
+                بررسی کد و ورود
+                <svg class="wizard-direction-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: 2FA Password -->
+        <div class="step-panel" id="step-panel-3">
+          <form id="form-tg-step3">
+            <div class="form-group">
+              <label class="form-label" for="tg-login-password">رمز عبور دو مرحله‌ای (2FA Cloud Password) <span class="req">*</span></label>
+              <input type="password" class="form-control" id="tg-login-password" placeholder="گذرواژه ابری اکانت خود را وارد کنید" required>
+              <p class="form-helper">این اکانت دارای تایید دو مرحله‌ای است.</p>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; background: transparent; border-top: none;">
+              <button type="button" class="btn btn-secondary" id="btn-tg-back-to-step2">بازگشت</button>
+              <button type="submit" class="btn btn-primary" id="btn-tg-verify-2fa">
+                تکمیل ورود و ثبت اکانت
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- MODAL: ADD / EDIT TELEGRAM CHANNEL -->
+  <!-- ==================================================== -->
+  <div class="modal-backdrop" id="modal-channel">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-channel-title">ثبت کانال تلگرام جدید</h3>
+        <button class="modal-close-btn" data-close="modal-channel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="form-channel">
+        <input type="hidden" id="channel-edit-id">
+        <div class="modal-body">
+
+          <!-- ── بخش ۱: مشخصات کانال تلگرام ── -->
+          <div class="channel-section">
+            <h4 class="section-title channel-section-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              اطلاعات کانال تلگرام
+            </h4>
+            <div class="form-group">
+              <label class="form-label" for="channel-input-link">لینک یا یوزرنیم کانال تلگرام <span class="req">*</span></label>
+              <input type="text" class="form-control" id="channel-input-link" placeholder="مثال: @durov یا https://t.me/durov یا durov" required style="direction: ltr; text-align: left;">
+              <p class="form-helper" id="channel-normalized-preview">شناسه تشخیص داده شده: <strong id="channel-normalized-val">-</strong></p>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="channel-title">عنوان نمایشی کانال (اختیاری)</label>
+              <input type="text" class="form-control" id="channel-title" placeholder="مثلاً: کانال رسمی اخبار">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="channel-interval">بازه بررسی و استخراج پیام‌ها (ثانیه) <span class="req">*</span></label>
+              <input type="number" class="form-control" id="channel-interval" value="60" min="10" required>
+              <p class="form-helper">حداقل ۱۰ ثانیه (پیش‌فرض: ۶۰ ثانیه)</p>
+            </div>
+            <div class="switch-wrapper" style="margin-top: 10px;">
+              <div class="switch-label-group">
+                <span class="switch-title">وضعیت فعال بودن رصد</span>
+                <span class="switch-desc">آیا فرآیند استخراج پیام‌ها برای این کانال شروع شود؟</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="channel-enabled-switch" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- ── بخش ۲: تنظیمات دانلود مدیا از تلگرام ── -->
+          <div class="channel-section">
+            <h4 class="section-title channel-section-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              تنظیمات دانلود مدیا از تلگرام
+            </h4>
+            <div class="form-group">
+              <div class="switch-wrapper">
+                <div class="switch-label-group">
+                  <span class="switch-title">حالت فقط متن (Text-Only)</span>
+                  <span class="switch-desc">فقط متن پیام‌ها دانلود و ذخیره شود (بدون مدیا)</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="tg-media-textonly">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tg-media-maxmb">سقف کلی حجم دانلود تلگرام (MB) – ۰ = بدون محدودیت</label>
+              <input type="number" class="form-control" id="tg-media-maxmb" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">محدودیت حجم دسته‌ای دانلود تلگرام (MB)</label>
+              <div class="media-cat-grid">
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>عکس</span>
+                    <input type="checkbox" id="tg-cat-photos-enable" checked>
+                  </div>
+                  <input type="number" class="form-control" id="tg-cat-photos-maxmb" min="0" placeholder="0 = نامحدود">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>ویدئو</span>
+                    <input type="checkbox" id="tg-cat-videos-enable" checked>
+                  </div>
+                  <input type="number" class="form-control" id="tg-cat-videos-maxmb" min="0" placeholder="MB">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>صدا</span>
+                    <input type="checkbox" id="tg-cat-audio-enable" checked>
+                  </div>
+                  <input type="number" class="form-control" id="tg-cat-audio-maxmb" min="0" placeholder="MB">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>سند</span>
+                    <input type="checkbox" id="tg-cat-documents-enable">
+                  </div>
+                  <input type="number" class="form-control" id="tg-cat-documents-maxmb" min="0" placeholder="MB">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>استیکر</span>
+                    <input type="checkbox" id="tg-cat-stickers-enable">
+                  </div>
+                  <input type="number" class="form-control" id="tg-cat-stickers-maxmb" min="0" placeholder="MB">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── بخش ۳: انتخاب کانال‌های ماتریکس مقصد (سلکتور اختصاصی) ── -->
+          <div class="channel-section matrix-sec">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+              <h4 class="section-title channel-section-header" style="margin: 0; padding: 0; border: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M7 8v8M17 8v8M12 8v8"/></svg>
+                کانال‌های ماتریکس مقصد (ارسال دیتا)
+              </h4>
+              <button type="button" class="btn btn-matrix btn-sm" id="btn-quick-add-matrix-channel" style="font-size: 0.78rem; padding: 4px 8px;">
+                ➕ کانال ماتریکس جدید
+              </button>
+            </div>
+            
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px;">
+              کانال‌های ماتریکسی که پیام‌های این کانال تلگرام به آنها فرستاده می‌شود را انتخاب کنید:
+            </p>
+
+            <div class="matrix-channels-picker" id="channel-matrix-pickers-list">
+              <!-- Populated dynamically with checkboxes of all defined Matrix Channels -->
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">
+                در حال بارگذاری کانال‌های ماتریکس...
+              </div>
+            </div>
+
+            <!-- Optional manual fallback Room IDs -->
+            <div style="margin-top: 14px;">
+              <details style="font-size: 0.82rem; color: var(--text-muted);">
+                <summary style="cursor: pointer; user-select: none;">تنظیمات پیشرفته: ارسال مستقیم به آدرس اتاق‌های ماتریکس (اختیاری)</summary>
+                <div class="form-group" style="margin-top: 8px;">
+                  <input type="text" class="form-control" id="channel-room-ids" placeholder="!room123:matrix.org" style="direction: ltr; text-align: left; font-size: 0.85rem;">
+                  <p class="form-helper">Alias یا Room ID اتاق‌ها را با کاما (,) جدا کنید</p>
+                </div>
+              </details>
+            </div>
+          </div>
+
+        </div><!-- end modal-body -->
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-channel">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-channel">ثبت کانال</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- MODAL: ADD / EDIT MATRIX CHANNEL -->
+  <!-- ==================================================== -->
+  <div class="modal-backdrop" id="modal-matrix-channel">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-matrix-channel-title">تعریف کانال ماتریکس جدید</h3>
+        <button class="modal-close-btn" data-close="modal-matrix-channel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="form-matrix-channel">
+        <input type="hidden" id="matrix-channel-edit-id">
+        <div class="modal-body">
+
+          <!-- مشخصات کانال ماتریکس -->
+          <div class="channel-section">
+            <h4 class="section-title channel-section-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M7 8v8M17 8v8M12 8v8"/></svg>
+              مشخصات کانال ماتریکس و سرور مقصد
+            </h4>
+            <div class="form-group">
+              <label class="form-label" for="matrix-channel-name">نام یا عنوان کانال ماتریکس <span class="req">*</span></label>
+              <input type="text" class="form-control" id="matrix-channel-name" placeholder="مثلاً: کانال اصلی اخبار ماتریکس" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="matrix-channel-server">اتصال به سرور ماتریکس <span class="req">*</span></label>
+              <select class="form-control" id="matrix-channel-server" required>
+                <!-- Populated dynamically from Matrix servers -->
+              </select>
+              <p class="form-helper">ربات این سرور ماتریکس پیام‌ها را به این اتاق می‌فرستد</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="matrix-channel-room-id">آدرس اتاق ماتریکس <span class="req">*</span></label>
+              <input type="text" class="form-control" id="matrix-channel-room-id" placeholder="#price:example.org" required style="direction: ltr; text-align: left;">
+              <p class="form-helper">نام عمومی اتاق (Alias) مثل <code dir="ltr">#price:example.org</code> یا شناسه اتاق (Room ID) مثل <code dir="ltr">!room123:example.org</code></p>
+            </div>
+
+            <div class="switch-wrapper" style="margin-top: 10px;">
+              <div class="switch-label-group">
+                <span class="switch-title">وضعیت فعال بودن کانال</span>
+                <span class="switch-desc">آیا ارسال به این کانال ماتریکس فعال باشد؟</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="matrix-channel-active-switch" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- قوانین آپلود مدیا به این کانال ماتریکس -->
+          <div class="channel-section matrix-sec">
+            <h4 class="section-title channel-section-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              تنظیمات آپلود مدیا (ماتریکس)
+            </h4>
+
+            <div class="form-group">
+              <div class="switch-wrapper">
+                <div class="switch-label-group">
+                  <span class="switch-title">فقط متن (Text-Only Mode)</span>
+                  <span class="switch-desc">فقط متن پیام‌ها به این کانال ماتریکس آپلود شود (بدون فایل مدیا)</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="mx-upload-textonly">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="mx-upload-maxmb">سقف کلی حجم آپلود ماتریکس (MB) – ۰ = بدون محدودیت</label>
+              <input type="number" class="form-control" id="mx-upload-maxmb" min="0" value="0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">محدودیت حجم دسته‌ای آپلود ماتریکس (MB)</label>
+              <div class="media-cat-grid">
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>عکس</span>
+                    <input type="checkbox" id="mx-cat-photos-enable" checked>
+                  </div>
+                  <input type="number" class="form-control" id="mx-cat-photos-maxmb" min="0" placeholder="0 = نامحدود">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>ویدئو</span>
+                    <input type="checkbox" id="mx-cat-videos-enable" checked>
+                  </div>
+                  <input type="number" class="form-control" id="mx-cat-videos-maxmb" min="0" placeholder="MB">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>صدا</span>
+                    <input type="checkbox" id="mx-cat-audio-enable" checked>
+                  </div>
+                  <input type="number" class="form-control" id="mx-cat-audio-maxmb" min="0" placeholder="MB">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>سند</span>
+                    <input type="checkbox" id="mx-cat-documents-enable">
+                  </div>
+                  <input type="number" class="form-control" id="mx-cat-documents-maxmb" min="0" placeholder="MB">
+                </div>
+                <div class="media-cat-item">
+                  <div class="media-cat-item-header">
+                    <span>استیکر</span>
+                    <input type="checkbox" id="mx-cat-stickers-enable">
+                  </div>
+                  <input type="number" class="form-control" id="mx-cat-stickers-maxmb" min="0" placeholder="MB">
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end modal-body -->
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-matrix-channel">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-matrix-channel">ثبت کانال ماتریکس</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- MODAL: ADD MATRIX SERVER -->
+  <!-- ==================================================== -->
+  <div class="modal-backdrop" id="modal-matrix">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>افزودن سرور ماتریکس جدید</h3>
+        <button class="modal-close-btn" data-close="modal-matrix">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="form-matrix-server">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="matrix-server-name">نام نمایشی سرور <span class="req">*</span></label>
+            <input type="text" class="form-control" id="matrix-server-name" placeholder="مثلاً: سرور اصلی سینپس یا Synapse Org" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="matrix-server-url">آدرس سرور ماتریکس <span class="req">*</span></label>
+            <input type="text" inputmode="url" class="form-control" id="matrix-server-url" placeholder="matrix.example.org" required dir="ltr" style="text-align: left;" aria-describedby="matrix-server-url-help">
+            <p class="form-helper" id="matrix-server-url-help">اگر فقط دامنه را وارد کنید، <bdi>https://</bdi> خودکار اضافه می‌شود.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="matrix-bot-userid">شناسه کاربری ربات (User ID) <span class="req">*</span></label>
+            <input type="text" class="form-control" id="matrix-bot-userid" placeholder="@mybot:matrix.org" required style="direction: ltr; text-align: left;">
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" for="matrix-bot-password" style="margin-bottom:0;">
+                رمز عبور ربات <span style="color:var(--accent-teal); font-size:0.78rem;">(جهت دریافت خودکار توکن)</span>
+              </label>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-fetch-matrix-token" style="padding: 2px 10px; font-size: 0.78rem; display: flex; align-items: center; gap: 4px;">
+                <span>🔑</span> دریافت خودکار توکن
+              </button>
+            </div>
+            <input type="password" class="form-control" id="matrix-bot-password" placeholder="رمز عبور اکانت ربات در سرور سینپس" style="direction: ltr; text-align: left;">
+            <p class="form-helper">اگر توکن ندارید، کافیست رمز عبور را وارد کنید تا سیستم خودکار به ماتریکس لاگین کند.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="matrix-bot-token">توکن دسترسی ربات (Access Token) <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(اختیاری در صورت ورود پسورد)</span></label>
+            <input type="password" class="form-control" id="matrix-bot-token" placeholder="syt_... (با زدن دکمه دریافت خودکار یا ذخیره پر می‌شود)" style="direction: ltr; text-align: left;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="matrix-default-room">آدرس اتاق پیش‌فرض (Alias یا Room ID)</label>
+            <input type="text" class="form-control" id="matrix-default-room" placeholder="#price:example.org" style="direction: ltr; text-align: left;">
+          </div>
+
+          <!-- Live Server Test Box -->
+          <div id="matrix-modal-test-result" class="test-result-box"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-test-matrix-in-modal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            تست اتصال سرور
+          </button>
+          <button type="submit" class="btn btn-matrix" id="btn-save-matrix-server">ذخیره سرور</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- MODAL: CONFIRM ACTION DIALOG -->
+  <!-- ==================================================== -->
+  <div class="modal-backdrop" id="modal-confirm">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 id="confirm-modal-title">تایید عملیات</h3>
+        <button class="modal-close-btn" data-close="modal-confirm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-modal-msg" style="color: var(--text-secondary); font-size: 0.92rem;">آیا از انجام این عملیات اطمینان دارید؟</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close="modal-confirm">انصراف</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-action-submit">بله، حذف کن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- LOGIN OVERLAY / AUTHENTICATION SCREEN -->
+  <!-- ==================================================== -->
+  <div class="login-overlay" id="login-overlay">
+    <div class="login-card">
+      <div class="login-language"></div>
+      <div class="login-brand">
+        <div class="brand-icon-wrapper large">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </div>
+        <h2>ورود به پنل مدیریت</h2>
+        <p>سامانه جمع‌آوری تلگرام و ارسال به ماتریکس</p>
+      </div>
+
+      <form id="form-login">
+        <!-- Step 1: Username & Password -->
+        <div id="login-step-credentials">
+          <div class="form-group">
+            <label class="form-label" for="login-username">نام کاربری</label>
+            <input type="text" class="form-control" id="login-username" placeholder="admin" required autocomplete="username" style="direction: ltr; text-align: left;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">رمز عبور</label>
+            <input type="password" class="form-control" id="login-password" placeholder="••••••••" required autocomplete="current-password" style="direction: ltr; text-align: left;">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-login-submit" style="margin-top: 15px;">
+            ورود به سیستم
+          </button>
+        </div>
+
+        <!-- Step 2: 2FA Verification Code -->
+        <div id="login-step-2fa" style="display: none;">
+          <div class="alert alert-info" style="margin-bottom: 15px; font-size: 0.88rem;">
+            🔐 ورود دومرحله‌ای برای این حساب فعال است. لطفاً کد ۶ رقمی برنامه Google Authenticator خود را وارد کنید.
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-2fa-code">کد ۶ رقمی ورود دومرحله‌ای</label>
+            <input type="text" class="form-control totp-input" id="login-2fa-code" placeholder="123456" maxlength="6" autocomplete="one-time-code" style="direction: ltr; text-align: center; letter-spacing: 6px; font-size: 1.3rem; font-weight: bold;">
+          </div>
+          <button type="button" class="btn btn-primary btn-block" id="btn-verify-2fa-submit" style="margin-top: 15px;">
+            تایید و ورود
+          </button>
+          <button type="button" class="btn btn-secondary btn-block" id="btn-back-to-credentials" style="margin-top: 8px;">
+            بازگشت
+          </button>
+        </div>
+
+        <div id="login-error-alert" class="alert alert-danger" style="display: none; margin-top: 15px; font-size: 0.88rem;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- MODAL: SECURITY & 2FA MANAGEMENT -->
+  <!-- ==================================================== -->
+  <div class="modal-backdrop" id="modal-security">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>تنظیمات امنیت و ورود دومرحله‌ای (2FA)</h3>
+        <button class="modal-close-btn" data-close="modal-security">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Status Card -->
+        <div class="security-status-card" id="security-status-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px;">
+          <div class="security-status-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="security-status-title" style="font-weight: 600;">وضعیت فعلی 2FA:</span>
+            <span class="badge" id="sec-2fa-badge">در حال بررسی...</span>
+          </div>
+          <p class="security-status-desc" id="sec-2fa-desc" style="font-size: 0.86rem; color: var(--text-secondary);">
+            با فعال‌سازی ورود دومرحله‌ای، هنگام ورود به پنل علاوه بر رمز عبور نیاز به وارد کردن کد ۶ رقمی اپلیکیشن Google Authenticator خواهید داشت.
+          </p>
+        </div>
+
+        <!-- Setup 2FA View (When 2FA is disabled) -->
+        <div id="sec-setup-view" style="display: none; margin-top: 20px;">
+          <div id="sec-qr-wrapper" class="qr-code-wrapper" style="text-align: center; margin-bottom: 15px;">
+            <div id="sec-qr-svg" class="qr-container" style="display: flex; justify-content: center;"></div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">
+              بارکد فوق را با اپلیکیشن Google Authenticator یا 1Password اسکن کنید.
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">کلید دستی (Secret Key)</label>
+            <div class="copy-input-group" style="display: flex; gap: 8px;">
+              <input type="text" class="form-control" id="sec-secret-text" readonly style="direction: ltr; text-align: center; font-family: monospace; font-weight: bold; flex: 1;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-secret">کپی کلید</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label class="form-label" for="sec-confirm-code">کد ۶ رقمی نمایش داده شده در اپلیکیشن</label>
+            <input type="text" class="form-control" id="sec-confirm-code" placeholder="123456" maxlength="6" style="direction: ltr; text-align: center; letter-spacing: 4px; font-weight: bold; font-size: 1.15rem;">
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" id="btn-confirm-enable-2fa" style="margin-top: 15px;">
+            تایید و فعال‌سازی 2FA
+          </button>
+        </div>
+
+        <!-- Initial Enable Trigger (When 2FA is disabled and setup not started) -->
+        <div id="sec-start-view" style="display: none; margin-top: 20px;">
+          <button type="button" class="btn btn-primary btn-block" id="btn-start-setup-2fa">
+            🔐 شروع فعال‌سازی ورود دومرحله‌ای (2FA)
+          </button>
+        </div>
+
+        <!-- Disable 2FA View (When 2FA is enabled) -->
+        <div id="sec-disable-view" style="display: none; margin-top: 20px;">
+          <div class="alert alert-warning" style="margin-bottom: 15px; font-size: 0.88rem;">
+            ⚠️ آیا مطمئن هستید که می‌خواهید ورود دومرحله‌ای را غیرفعال کنید؟ این کار امنیت پنل را کاهش می‌دهد.
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sec-disable-password">رمز عبور حساب برای تایید غیرفعال‌سازی</label>
+            <input type="password" class="form-control" id="sec-disable-password" placeholder="رمز عبور فعلی" style="direction: ltr; text-align: left;">
+          </div>
+          <button type="button" class="btn btn-danger btn-block" id="btn-submit-disable-2fa" style="margin-top: 15px;">
+            غیرفعال‌سازی ورود دومرحله‌ای
+          </button>
+        </div>
+
+        <!-- Change Password Accordion / Section -->
+        <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--text-primary);">تغییر رمز عبور ورود</h4>
+          <div class="form-group">
+            <label class="form-label" for="sec-old-pass">رمز عبور فعلی</label>
+            <input type="password" class="form-control" id="sec-old-pass" style="direction: ltr; text-align: left;">
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label class="form-label" for="sec-new-pass">رمز عبور جدید</label>
+            <input type="password" class="form-control" id="sec-new-pass" placeholder="حداقل ۶ کاراکتر" style="direction: ltr; text-align: left;">
+          </div>
+          <button type="button" class="btn btn-secondary btn-block" id="btn-change-password-submit" style="margin-top: 10px;">
+            ذخیره رمز عبور جدید
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-matrix-reconnect">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matrix-reconnect-title">
+      <div class="modal-header">
+        <h3 id="matrix-reconnect-title">ورود مجدد به حساب Matrix</h3>
+        <button type="button" class="modal-close-btn" data-close="modal-matrix-reconnect" aria-label="بستن">×</button>
+      </div>
+      <form id="form-matrix-reconnect">
+        <div class="modal-body">
+          <p class="form-helper">رمز جدید همین حساب را وارد کنید. اتاق‌ها و کانال‌های متصل به سرور حفظ می‌شوند.</p>
+          <dl class="matrix-verification-identity">
+            <dt>سرور</dt><dd id="matrix-reconnect-server"></dd>
+            <dt>حساب بات</dt><dd id="matrix-reconnect-user" dir="ltr"></dd>
+          </dl>
+          <label class="form-label" for="matrix-reconnect-password">رمز عبور حساب Matrix</label>
+          <input type="password" id="matrix-reconnect-password" class="form-control" autocomplete="off" required dir="ltr">
+          <label class="matrix-recovery-consent" id="matrix-reconnect-lan-note" hidden>
+            <input type="checkbox" id="matrix-reconnect-lan-ack">
+            <span>پنل روی HTTP است و رمز در این ارتباط رمزنگاری نمی‌شود. استفاده در شبکهٔ خصوصیِ مورد اعتماد را تأیید می‌کنم.</span>
+          </label>
+          <p class="form-helper" id="matrix-reconnect-secure-help" hidden>برای ورود مجدد از HTTPS، localhost یا IP خصوصی خود سرور استفاده کنید.</p>
+          <p id="matrix-reconnect-error" class="test-result-box error" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-matrix-reconnect">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btn-matrix-reconnect">ورود مجدد</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="modal-matrix-verification">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matrix-verification-title">
+      <div class="modal-header">
+        <h3 id="matrix-verification-title">تأیید دستگاه Matrix</h3>
+        <button type="button" class="modal-close-btn" data-close="modal-matrix-verification" aria-label="بستن">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="form-helper matrix-verification-guide">
+          در Element با <strong>همان حساب بات</strong> و یک نشست تأییدشده وارد شوید. درخواست را در آن نشست بپذیرید و نشانه‌ها را با این پنل مقایسه کنید.
+          <a class="link-highlight" href="https://docs.element.io/latest/element-support/device-verification/how-to-verify-devices/" target="_blank" rel="noopener noreferrer">راهنمای تأیید نشست Element</a>
+        </p>
+        <dl class="matrix-verification-identity" id="matrix-verification-identity" hidden>
+          <dt>حساب بات</dt><dd id="matrix-verification-user" dir="ltr"></dd>
+          <dt>شناسهٔ دستگاه</dt><dd id="matrix-verification-device" dir="ltr"></dd>
+        </dl>
+        <p class="test-result-box visible" id="matrix-verification-status" role="status"></p>
+        <div id="matrix-verification-sas" class="matrix-verification-sas" dir="ltr" hidden></div>
+        <details class="matrix-verification-recovery" id="matrix-verification-recovery" hidden>
+          <summary>تأیید با کلید بازیابی</summary>
+          <p class="form-helper">بدون نشست دوم، Recovery Key همین حساب را وارد کنید. در Element از بخش Encryption به گزینه‌های کلید بازیابی دسترسی دارید.</p>
+          <p class="form-helper" id="matrix-verification-secure-help" hidden>این بخش با HTTPS، روی localhost یا از آدرس IP خصوصی خود سرور باز می‌شود.</p>
+          <label class="matrix-recovery-consent" id="matrix-recovery-lan-consent" hidden>
+            <input type="checkbox" id="matrix-recovery-lan-ack">
+            <span>پنل روی HTTP است و رمز عبور و کلید بازیابی در این ارتباط رمزنگاری نمی‌شوند. تأیید می‌کنم در شبکهٔ خصوصیِ مورد اعتماد هستم.</span>
+          </label>
+          <form id="form-matrix-recovery">
+            <label class="form-label" for="matrix-recovery-key">کلید بازیابی</label>
+            <input type="password" class="form-control" id="matrix-recovery-key" required autocomplete="off" spellcheck="false" dir="ltr">
+            <button type="submit" class="btn btn-primary" id="btn-matrix-recovery-verify">تأیید با کلید</button>
+          </form>
+          <button type="button" class="btn btn-secondary" id="btn-matrix-recovery-prepare">ساخت کلید برای حساب بدون کلید بازیابی</button>
+          <button type="button" class="btn btn-danger" id="btn-matrix-recovery-reset-prepare">کلید را ندارم؛ آماده‌سازی بازنشانی</button>
+          <div id="matrix-recovery-generated" hidden>
+            <label class="form-label" for="matrix-recovery-generated-key">کلید بازیابی جدید</label>
+            <input type="text" class="form-control" id="matrix-recovery-generated-key" readonly autocomplete="off" spellcheck="false" dir="ltr">
+            <p class="form-helper">ابتدا کلید را در جای امن ذخیره کنید. بعد ثبت را بزنید تا Matrix از آن استفاده کند.</p>
+            <div id="matrix-recovery-reset-fields" hidden>
+              <p class="test-result-box visible error">بازنشانی، کلید بازیابی و بکاپ رمزنگاری قبلی همین حساب بات را حذف می‌کند. پیام‌های قدیمی‌ای که کلیدشان فقط در آن بکاپ بوده ممکن است دیگر خواندنی نباشند. نشست‌های تأییدشدهٔ قبلی هم باید دوباره تأیید شوند.</p>
+              <label class="form-label" for="matrix-recovery-reset-password">رمز عبور حساب Matrix بات</label>
+              <input type="password" class="form-control" id="matrix-recovery-reset-password" autocomplete="off" dir="ltr">
+              <label class="matrix-recovery-consent">
+                <input type="checkbox" id="matrix-recovery-reset-ack">
+                <span>کلید جدید را ذخیره کردم و حذف کلیدها و بکاپ رمزنگاری قدیمی همین حساب را تأیید می‌کنم.</span>
+              </label>
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-matrix-recovery-setup">ذخیره کردم، ثبت و تأیید</button>
+          </div>
+        </details>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close="modal-matrix-verification">بستن</button>
+        <button type="button" class="btn btn-danger" id="btn-matrix-verification-cancel" hidden>لغو درخواست</button>
+        <button type="button" class="btn btn-primary" id="btn-matrix-verification-confirm" hidden>مطابقت دارند</button>
+        <button type="button" class="btn btn-primary" id="btn-matrix-verification-start" hidden>ارسال درخواست تأیید</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Main Application Script (ES Module) -->
+  <template id="panel-language-template">
+    <select class="form-control panel-language" data-panel-language aria-label="Panel language">
+      <option value="en" lang="en">English</option>
+      <option value="fa" lang="fa">فارسی</option>
+    </select>
+  </template>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+services:
+  mongodb:
+    image: mongo:4.4
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - "./mongo-data:/data/db"
+      - ./mongo-config:/data/configdb
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+
+  backend:
+    image: gigplus/telegram_collector:${COLLECTOR_TAG:-latest}
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "${PORT:-3080}:3080"
+    environment:
+      PORT: 3080
+      MONGO_HOST: mongodb
+      COLLECTOR_STORAGE_ROOT: /app/storage
+    volumes:
+      - ./matrix-crypto:/app/matrix-crypto
+      - ./temp:/app/temp
+      - ./storage:/app/storage
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3080/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 12

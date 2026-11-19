@@ -1,0 +1,42 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:collector": "node Collector/index.js",
+    "dev": "nodemon server.js",
+    "dev:collector": "nodemon Collector/index.js",
+    "start:collector:login": "node Collector/login.js",
+    "dev:all": "npm run dev",
+    "start:all": "npm start"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "https-proxy-agent": "^7.0.6",
+    "indexeddbshim": "19.0.7",
+    "input": "^1.0.1",
+    "matrix-js-sdk": "^41.5.0-rc.0",
+    "mime-types": "^3.0.2",
+    "mongoose": "^8.18.1",
+    "morgan": "^1.10.1",
+    "node-fetch": "^3.3.2",
+    "qrcode": "^1.5.4",
+    "socks-proxy-agent": "^8.0.5",
+    "telegram": "^2.26.22"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "overrides": {
+    "@node-static/node-static": {
+      "minimatch": "^11.0.1"
+    }
+  }
+}
