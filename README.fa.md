@@ -6,7 +6,7 @@
 
 پنل به‌طور پیش‌فرض به انگلیسی باز می‌شود. از صفحهٔ ورود، نوار بالای پنل یا داخل هر پنجره می‌توانید به فارسی بروید. مرورگر انتخابتان را برای بازدید بعدی نگه می‌دارد.
 
-[ایمیج Docker Hub](https://hub.docker.com/r/gigplus/telegram_collector) · [راهنمای رمزنگاری و تأیید دستگاه](docs/ENCRYPTION_SETUP.md) · [متن صفحهٔ Docker Hub](docs/DOCKER_HUB.md)
+[نسخه‌های انتشار گیت‌هاب](https://github.com/GiGPlus-Live/telegram_collector/releases) · [ایمیج Docker Hub](https://hub.docker.com/r/gigplus/telegram_collector) · [راهنمای رمزنگاری و تأیید دستگاه](docs/ENCRYPTION_SETUP.md) · [متن صفحهٔ Docker Hub](docs/DOCKER_HUB.md)
 
 ## امکانات پنل در یک نگاه
 
@@ -36,6 +36,17 @@ Compose ایمیج `gigplus/telegram_collector:latest` و MongoDB را اجرا 
 - برای فعال‌سازی ورود دومرحله‌ای، QR را با برنامهٔ Authenticator اسکن کنید یا کلید دستی را وارد کنید. سپس کد شش‌رقمی را در پنل تأیید کنید. بعد از فعال‌سازی، این کد در ورودهای بعدی به پنل لازم است.
 
 اگر فقط ایمیج را می‌خواهید، نمونهٔ کامل و قابل کپی Compose در [README مخصوص Docker Hub](docs/DOCKER_HUB.md) آمده است.
+
+### نصب بیلد داکر از گیت‌هاب
+
+از [صفحهٔ انتشار گیت‌هاب](https://github.com/GiGPlus-Live/telegram_collector/releases) نسخه‌ای را انتخاب کنید و فایل `compose.yaml` و آرشیو ایمیج همان نسخه با پسوند `.tar.gz` را در یک پوشه بگذارید. دستورهای زیر برای نسخهٔ `v1.0.0` هستند.
+
+```sh
+docker load --input telegram_collector-v1.0.0-linux-amd64.tar.gz
+docker compose up -d --wait
+```
+
+فایل Compose همان نسخه را اجرا می‌کند. هنگام ارتقا، پوشه‌های دادهٔ نصب قبلی را در کنار فایل نگه دارید. برای بررسی صحت دانلودها از `SHA256SUMS` استفاده کنید. با پوش یک تگ مثل `v1.0.0`، [گردش کار GitHub Actions](.github/workflows/docker-release.yml) ایمیج لینوکس amd64 را می‌سازد، تست می‌کند و در رجیستری و صفحهٔ انتشار گیت‌هاب قرار می‌دهد.
 
 ## ۲. اتصال تلگرام و پروکسی
 

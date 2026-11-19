@@ -6,7 +6,7 @@ Telegram Collector is a self-hosted bridge with an English and Persian web panel
 
 The panel opens in English by default. Switch to Persian from the sign-in page, the panel header, or any dialog. Your browser remembers your choice for future visits.
 
-[Docker Hub image](https://hub.docker.com/r/gigplus/telegram_collector) · [Matrix encryption guide (فارسی)](docs/ENCRYPTION_SETUP.md)
+[GitHub Releases](https://github.com/GiGPlus-Live/telegram_collector/releases) · [Docker Hub image](https://hub.docker.com/r/gigplus/telegram_collector) · [Matrix encryption guide (فارسی)](docs/ENCRYPTION_SETUP.md)
 
 ## What you can manage in the panel
 
@@ -34,6 +34,17 @@ Open [localhost:3080](http://localhost:3080). For a server installation, use its
 The initial username and password on a fresh database are both `admin`. Change the default password from **Security & 2FA**. You can also enable six-digit TOTP codes using an authenticator app. The app creates its session signing key on first start and the supplied Compose deployment runs without a `.env` file.
 
 For a standalone Compose file and image setup, see the [Docker Hub guide](docs/DOCKER_HUB.md).
+
+### Install a Docker build from GitHub
+
+Choose a version under [Releases](https://github.com/GiGPlus-Live/telegram_collector/releases). Download `compose.yaml` and the `.tar.gz` image archive for that version into the same folder. The following example uses `v1.0.0`.
+
+```sh
+docker load --input telegram_collector-v1.0.0-linux-amd64.tar.gz
+docker compose up -d --wait
+```
+
+The downloaded Compose file pins the collector to that release. Keep your existing data folders next to it when upgrading. `SHA256SUMS` contains checksums for the downloads. A version tag such as `v1.0.0` triggers the [GitHub Actions workflow](.github/workflows/docker-release.yml) to build and test the Linux amd64 image and publish it to GitHub Container Registry and Releases.
 
 ## Set up your first route
 
